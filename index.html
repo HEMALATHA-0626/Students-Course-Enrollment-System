@@ -320,7 +320,11 @@ td.mono { font-family:var(--font-mono); font-size:.82rem; color:var(--teal); }
   <div class="topbar">
     <div class="topbar-inner">
       <a href="javascript:void(0)" class="brand">CE<div class="brand-mark" style="display:none;"></div>&nbsp;Course Enrollment <span style="opacity:.5; font-weight:400; font-size:.85rem; margin-left:6px;">Admin</span></a>
-      <div class="topbar-user"><span id="adminUserName"></span><button class="btn-logout" onclick="logout()">Log Out</button></div>
+      <div class="topbar-user">
+        <a href="javascript:void(0)" class="nav-link" onclick="goToEnrollments()">All Enrollments</a>
+        <span id="adminUserName"></span>
+        <button class="btn-logout" onclick="logout()">Log Out</button>
+      </div>
     </div>
   </div>
   <div class="page-head">
@@ -347,9 +351,26 @@ td.mono { font-family:var(--font-mono); font-size:.82rem; color:var(--teal); }
       </table>
     </div>
   </div>
+</div>
+
+<!-- ============ VIEW: ALL ENROLLMENTS (own page) ============ -->
+<div id="view-enrollments" class="hidden">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a href="javascript:void(0)" class="brand">CE<div class="brand-mark" style="display:none;"></div>&nbsp;Course Enrollment <span style="opacity:.5; font-weight:400; font-size:.85rem; margin-left:6px;">Admin</span></a>
+      <div class="topbar-user">
+        <a href="javascript:void(0)" class="nav-link" onclick="backToAdmin()">Admin Panel</a>
+        <span id="enrollmentsUserName"></span>
+        <button class="btn-logout" onclick="logout()">Log Out</button>
+      </div>
+    </div>
+  </div>
+  <div class="page-head">
+    <div class="eyebrow">Admin Panel</div>
+    <h1>All Enrollments</h1>
+    <p>Every student currently enrolled, across all courses.</p>
+  </div>
   <div class="section">
-    <div class="section-title">All Enrollments</div>
-    <p class="section-desc">Every student currently enrolled, across all courses.</p>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Student</th><th>Email</th><th>Course</th><th>Enrolled On</th></tr></thead>
@@ -415,7 +436,7 @@ let session = JSON.parse(sessionStorage.getItem('session') || 'null'); // {role,
 
 // ---------- View router ----------
 function goTo(view) {
-  ['landing', 'register', 'dashboard', 'catalog', 'admin'].forEach(v => {
+  ['landing', 'register', 'dashboard', 'catalog', 'admin', 'enrollments'].forEach(v => {
     document.getElementById('view-' + v).classList.toggle('hidden', v !== view);
   });
   window.scrollTo(0, 0);
@@ -530,6 +551,17 @@ function goToCatalog() {
 function backToDashboard() {
     renderDashboard();
     goTo('dashboard');
+}
+
+function goToEnrollments() {
+    document.getElementById('enrollmentsUserName').textContent = session.username;
+    goTo('enrollments');
+    renderEnrollmentsPage();
+}
+
+function backToAdmin() {
+    renderAdmin();
+    goTo('admin');
 }
 // ---------- Student dashboard ----------
 function enterDashboard() {
@@ -664,7 +696,9 @@ function renderAdmin() {
           <button class="btn btn-danger-ghost btn-sm" onclick="deleteCourse(${c.id})">Delete</button>
         </div></td>
       </tr>`).join('');
+}
 
+function renderEnrollmentsPage() {
   const eBody = document.getElementById('enrollmentsTableBody');
   const rows = db.enrollments.map(e => ({
     ...e,
